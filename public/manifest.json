@@ -1,0 +1,22 @@
+{
+  "name": "Catatan Tempo Pakan",
+  "short_name": "Tempo Pakan",
+  "description": "Aplikasi manajemen piutang dan jatuh tempo pakan ternak sapi",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a492d",
+  "theme_color": "#0a492d",
+  "icons": [
+    {
+      "src": "/images/cow-avatar-1.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/images/cow-avatar-1.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
