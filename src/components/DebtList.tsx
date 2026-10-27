@@ -322,11 +322,18 @@ export default function DebtList({
               <div className="flex items-center justify-between pt-1 border-t border-slate-100/80">
                 <div>
                   <span className="text-[10px] text-slate-500 block leading-tight font-normal">
-                    {item.originalAmount && item.totalAmount < item.originalAmount ? 'Sisa Piutang' : 'Total Piutang'}
+                    {isPaid ? 'Sisa Piutang' : item.originalAmount && item.totalAmount < item.originalAmount ? 'Sisa Piutang' : 'Total Piutang'}
                   </span>
-                  <p className="text-xs font-bold text-slate-900 tracking-tight leading-tight mt-0.5">
-                    {formatRupiah(item.totalAmount)}
-                  </p>
+                  <div className="flex items-baseline gap-1.5 mt-0.5">
+                    <p className={`text-xs font-bold tracking-tight leading-tight ${isPaid ? 'text-emerald-700' : 'text-slate-900'}`}>
+                      {isPaid ? 'Rp 0' : formatRupiah(item.totalAmount)}
+                    </p>
+                    {isPaid && (
+                      <span className="text-[10px] text-slate-400 font-normal">
+                        (Total: {formatRupiah(item.originalAmount || item.totalAmount)})
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {isPaid ? (

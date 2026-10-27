@@ -212,7 +212,7 @@ export function CustomerDetailModal({
           <div className="flex justify-between text-xs text-slate-600 border-t border-slate-200/60 pt-1.5">
             <span>Sisa Piutang:</span>
             <span className="font-bold text-emerald-700 text-sm">
-              {formatRupiah(debt.totalAmount)}
+              {debt.status === 'paid' ? 'Rp 0 (Lunas)' : formatRupiah(debt.totalAmount)}
             </span>
           </div>
 

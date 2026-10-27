@@ -131,14 +131,28 @@ export const debtService = {
     }
   },
 
-  async markAsPaid(debtId: string, paidAt: string): Promise<boolean> {
+  async markAsPaid(
+    debtId: string,
+    paidAt: string,
+    newHistory?: PaymentLog[],
+    originalAmount?: number
+  ): Promise<boolean> {
     if (!isSupabaseConfigured()) {
       if (typeof window !== 'undefined') {
         const local = localStorage.getItem(LOCAL_STORAGE_DEBTS_KEY);
         if (local) {
           const list: DebtRecord[] = JSON.parse(local);
           const updated = list.map((d) =>
-            d.id === debtId ? { ...d, status: 'paid' as const, dueDateLabel: 'Lunas', paidAt } : d
+            d.id === debtId
+              ? {
+                  ...d,
+                  status: 'paid' as const,
+                  dueDateLabel: 'Lunas',
+                  paidAt,
+                  totalAmount: 0,
+                  paymentHistory: newHistory || d.paymentHistory || [],
+                }
+              : d
           );
           localStorage.setItem(LOCAL_STORAGE_DEBTS_KEY, JSON.stringify(updated));
         }
@@ -147,13 +161,22 @@ export const debtService = {
     }
 
     try {
+      const updatePayload: any = {
+        status: 'paid',
+        due_date_label: 'Lunas',
+        paid_at: paidAt,
+        total_amount: 0,
+      };
+      if (newHistory) {
+        updatePayload.payment_history = newHistory;
+      }
+      if (originalAmount) {
+        updatePayload.original_amount = originalAmount;
+      }
+
       const { error } = await supabase
         .from('debts')
-        .update({
-          status: 'paid',
-          due_date_label: 'Lunas',
-          paid_at: paidAt,
-        })
+        .update(updatePayload)
         .eq('id', debtId);
 
       if (error) {
@@ -167,14 +190,29 @@ export const debtService = {
     }
   },
 
-  async undoPaid(debtId: string, restoredStatus: DebtRecord['status'], restoredLabel: string): Promise<boolean> {
+  async undoPaid(
+    debtId: string,
+    restoredStatus: DebtRecord['status'],
+    restoredLabel: string,
+    restoredTotal?: number,
+    restoredHistory?: PaymentLog[]
+  ): Promise<boolean> {
     if (!isSupabaseConfigured()) {
       if (typeof window !== 'undefined') {
         const local = localStorage.getItem(LOCAL_STORAGE_DEBTS_KEY);
         if (local) {
           const list: DebtRecord[] = JSON.parse(local);
           const updated = list.map((d) =>
-            d.id === debtId ? { ...d, status: restoredStatus, dueDateLabel: restoredLabel, paidAt: undefined } : d
+            d.id === debtId
+              ? {
+                  ...d,
+                  status: restoredStatus,
+                  dueDateLabel: restoredLabel,
+                  paidAt: undefined,
+                  totalAmount: restoredTotal !== undefined ? restoredTotal : d.totalAmount,
+                  paymentHistory: restoredHistory !== undefined ? restoredHistory : d.paymentHistory,
+                }
+              : d
           );
           localStorage.setItem(LOCAL_STORAGE_DEBTS_KEY, JSON.stringify(updated));
         }
@@ -183,13 +221,21 @@ export const debtService = {
     }
 
     try {
+      const updatePayload: any = {
+        status: restoredStatus,
+        due_date_label: restoredLabel,
+        paid_at: null,
+      };
+      if (restoredTotal !== undefined) {
+        updatePayload.total_amount = restoredTotal;
+      }
+      if (restoredHistory !== undefined) {
+        updatePayload.payment_history = restoredHistory;
+      }
+
       const { error } = await supabase
         .from('debts')
-        .update({
-          status: restoredStatus,
-          due_date_label: restoredLabel,
-          paid_at: null,
-        })
+        .update(updatePayload)
         .eq('id', debtId);
 
       if (error) {

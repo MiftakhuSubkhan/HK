@@ -12,7 +12,7 @@ import Toast, { ToastMessage } from '../components/Toast';
 import { NotificationModal, CustomerDetailModal, PartialPaymentModal } from '../components/Modals';
 import { CustomersView, TransactionsView } from '../components/OtherViews';
 import { INITIAL_CUSTOMERS, INITIAL_DEBTS, INITIAL_STATS } from '../data/initialData';
-import { CustomerSuggestion, DebtRecord, SummaryStats } from '../types';
+import { CustomerSuggestion, DebtRecord, PaymentLog, SummaryStats } from '../types';
 import { debtService } from '../services/debtService';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { X, ShieldCheck, History, Cloud, HardDrive } from 'lucide-react';
@@ -65,11 +65,16 @@ export default function Home() {
 
     const totalPaidFromHistory = debtsList.reduce((sum, d) => {
       const historySum = (d.paymentHistory || []).reduce((hSum, p) => hSum + p.amount, 0);
-      const fullPaidSum =
-        d.status === 'paid' && (!d.paymentHistory || d.paymentHistory.length === 0)
-          ? d.originalAmount || d.totalAmount
-          : 0;
-      return sum + historySum + fullPaidSum;
+
+      if (d.status === 'paid') {
+        // Jika sudah berstatus lunas, uang pelunasan adalah akumulasi cicilan
+        // atau minimal senilai total awal transaksi jika pelunasan langsung
+        const fullDebtAmount = d.originalAmount || d.totalAmount || 0;
+        return sum + Math.max(historySum, fullDebtAmount);
+      } else {
+        // Jika transaksi masih berjalan, yang dihitung sebagai uang masuk adalah cicilan yang sudah dibayarkan
+        return sum + historySum;
+      }
     }, 0);
 
     return {
@@ -124,14 +129,31 @@ export default function Home() {
     if (!target || target.status === 'paid') return;
 
     const paidAt = new Date().toISOString();
+    const remainingToPay = target.totalAmount;
+    const originalDebtAmount = target.originalAmount || remainingToPay;
+
+    // Catat pelunasan langsung ke paymentHistory agar saldo Lunas dan riwayat pembayaran sinkron
+    let updatedHistory = target.paymentHistory || [];
+    if (remainingToPay > 0) {
+      const fullPaymentLog: PaymentLog = {
+        id: 'pay-' + Date.now(),
+        amount: remainingToPay,
+        paidAt,
+        note: 'Pelunasan langsung',
+      };
+      updatedHistory = [fullPaymentLog, ...updatedHistory];
+    }
 
     const updated = debts.map((item) => {
       if (item.id === debtId) {
         return {
           ...item,
+          totalAmount: 0,
+          originalAmount: originalDebtAmount,
           status: 'paid' as const,
           dueDateLabel: 'Lunas',
           paidAt,
+          paymentHistory: updatedHistory,
         };
       }
       return item;
@@ -140,13 +162,13 @@ export default function Home() {
     setDebts(updated);
     setStats(calculateStats(updated));
 
-    await debtService.markAsPaid(debtId, paidAt);
+    await debtService.markAsPaid(debtId, paidAt, updatedHistory, originalDebtAmount);
 
     triggerConfetti();
     showToast(
       'success',
       'Piutang Berhasil Ditandai Lunas!',
-      `${target.customerName} sebesar Rp ${target.totalAmount.toLocaleString('id-ID')} telah lunas.`
+      `${target.customerName} sebesar Rp ${remainingToPay.toLocaleString('id-ID')} telah lunas.`
     );
   };
 
@@ -163,13 +185,29 @@ export default function Home() {
       originalLabel = res.dueDateLabel;
     }
 
+    let restoredHistory = target.paymentHistory || [];
+    let restoredTotal = target.originalAmount || 0;
+
+    // Jika pembayaran teratas adalah 'Pelunasan langsung', batalkan pencatatan tersebut
+    if (restoredHistory.length > 0 && restoredHistory[0].note === 'Pelunasan langsung') {
+      const directPaidAmount = restoredHistory[0].amount;
+      restoredHistory = restoredHistory.slice(1);
+      const remainingCicilan = restoredHistory.reduce((sum, p) => sum + p.amount, 0);
+      restoredTotal = Math.max(0, (target.originalAmount || directPaidAmount) - remainingCicilan);
+    } else {
+      const totalCicil = restoredHistory.reduce((sum, p) => sum + p.amount, 0);
+      restoredTotal = Math.max(0, (target.originalAmount || 0) - totalCicil);
+    }
+
     const updated = debts.map((item) => {
       if (item.id === debtId) {
         return {
           ...item,
+          totalAmount: restoredTotal,
           status: originalStatus,
           dueDateLabel: originalLabel,
           paidAt: undefined,
+          paymentHistory: restoredHistory,
         };
       }
       return item;
@@ -178,7 +216,7 @@ export default function Home() {
     setDebts(updated);
     setStats(calculateStats(updated));
 
-    await debtService.undoPaid(debtId, originalStatus, originalLabel);
+    await debtService.undoPaid(debtId, originalStatus, originalLabel, restoredTotal, restoredHistory);
 
     showToast(
       'info',
