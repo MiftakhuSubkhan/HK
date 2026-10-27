@@ -15,7 +15,7 @@ import { INITIAL_CUSTOMERS, INITIAL_DEBTS, INITIAL_STATS } from '../data/initial
 import { CustomerSuggestion, DebtRecord, PaymentLog, SummaryStats } from '../types';
 import { debtService } from '../services/debtService';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { X, ShieldCheck, History, Cloud, HardDrive } from 'lucide-react';
+import { X, ShieldCheck, History, Cloud, HardDrive, Download, Activity } from 'lucide-react';
 import {
   getDaysDifferenceFromToday,
   calculateDebtStatus,
@@ -431,6 +431,36 @@ export default function Home() {
     );
   };
 
+  const handleExportBackup = () => {
+    try {
+      const backupData = {
+        appName: 'Catatan Tempo Pakan',
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        customersCount: customers.length,
+        debtsCount: debts.length,
+        customers,
+        debts,
+      };
+
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute(
+        'download',
+        `backup-catatan-tempo-${new Date().toISOString().split('T')[0]}.json`
+      );
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast('success', 'Cadangan Berhasil Diunduh!', 'File salinan data peternak & piutang telah tersimpan di perangkat.');
+    } catch (err) {
+      console.error('Backup error:', err);
+      showToast('warning', 'Gagal Membuat Cadangan', 'Terjadi kesalahan saat mengunduh data.');
+    }
+  };
+
   return (
     <PhoneMockup viewMode={viewMode}>
       <Toast toast={toast} onClose={() => setToast(null)} />
@@ -608,15 +638,33 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200/70 rounded-xl space-y-1 text-[11px]">
+              <div className="pt-2 border-t border-slate-100 space-y-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
+                  Keamanan & Cadangan Data
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleExportBackup}
+                  className="w-full text-left px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-semibold flex items-center justify-between text-xs transition-colors cursor-pointer border border-emerald-200/70"
+                >
+                  <div className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-emerald-700" />
+                    <span>Unduh Cadangan (Backup)</span>
+                  </div>
+                  <span className="text-[9.5px] bg-emerald-200/70 text-emerald-800 px-1.5 py-0.5 rounded font-bold">
+                    JSON
+                  </span>
+                </button>
+              </div>
+
+              <div className="p-3 bg-slate-50 border border-slate-200/70 rounded-xl space-y-1.5 text-[11px]">
                 <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                  <Cloud className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>Status Database Cloud</span>
+                  <Activity className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Cron Keep-Alive Aktif 24/7</span>
                 </div>
                 <p className="text-slate-600 leading-snug">
-                  {isCloudEnabled
-                    ? 'Aplikasi aktif terhubung ke database online Supabase. Data tersinkronisasi antar perangkat.'
-                    : 'Aplikasi saat ini menyimpan data di penyimpanan browser lokal. Tambahkan API Key di .env.local untuk menghubungkan ke Supabase.'}
+                  Sistem otomatis menyapa database Supabase setiap hari via Vercel Cron & GitHub Actions agar database aktif terus dan tidak pernah tidur/pause.
                 </p>
               </div>
             </div>

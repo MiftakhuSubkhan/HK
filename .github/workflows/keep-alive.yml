@@ -1,0 +1,22 @@
+name: Supabase Keep-Alive Cron
+
+on:
+  schedule:
+    # Berjalan setiap 2 hari sekali jam 03:00 UTC (10:00 WIB)
+    - cron: '0 3 */2 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database to Reset Inactivity Timer
+        run: |
+          echo "Pinging Supabase database to keep it alive 24/7..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhha2F5cHdtb3BtaXVwYnBqcmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MzI3MTYsImV4cCI6MjEwODEwODcxNn0.GaTN0SRPmdhpLY6fBjs5L3NI1C900skhEs4hkfj3KbU" "https://hakaypwmopmiupbpjrbe.supabase.co/rest/v1/debts?select=id&limit=1")
+          echo "Supabase response code: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "Success! Supabase inactivity timer has been reset."
+          else
+            echo "Response: $HTTP_STATUS"
+          fi
