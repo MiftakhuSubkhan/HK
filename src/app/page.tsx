@@ -27,6 +27,7 @@ export default function Home() {
   const [stats, setStats] = useState<SummaryStats>(INITIAL_STATS);
   const [customers, setCustomers] = useState<CustomerSuggestion[]>(INITIAL_CUSTOMERS);
   const [activeTab, setActiveTab] = useState<NavTab>('beranda');
+  const [viewMode, setViewMode] = useState<'tablet' | 'phone'>('tablet');
 
   const [isCloudEnabled, setIsCloudEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -393,7 +394,7 @@ export default function Home() {
   };
 
   return (
-    <PhoneMockup>
+    <PhoneMockup viewMode={viewMode}>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
       <Header
@@ -402,11 +403,13 @@ export default function Home() {
         unreadNotificationsCount={
           debts.filter((d) => d.status === 'due_2_days' || d.status === 'due_5_days').length
         }
+        viewMode={viewMode}
+        onChangeViewMode={(mode) => setViewMode(mode)}
       />
 
-      <div className="px-3 pt-2 shrink-0">
+      <div className="px-3 md:px-6 pt-2 shrink-0">
         <div
-          className={`flex items-center justify-between px-2.5 py-1 rounded-xl text-[10px] font-semibold transition-all ${
+          className={`flex items-center justify-between px-2.5 py-1 md:py-1.5 md:px-3.5 rounded-xl text-[10px] md:text-xs font-semibold transition-all ${
             isCloudEnabled
               ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/90'
               : 'bg-amber-50 text-amber-800 border border-amber-200/90'
@@ -427,7 +430,7 @@ export default function Home() {
                 : 'Penyimpanan Lokal Aktif (Data Tersimpan di HP/Browser)'}
             </span>
           </div>
-          <span className="text-[9.5px] opacity-75 font-normal">
+          <span className="text-[9.5px] md:text-[11px] opacity-75 font-normal">
             {isCloudEnabled ? 'Live Real-time' : 'Buka .env.local untuk Cloud'}
           </span>
         </div>
@@ -436,25 +439,50 @@ export default function Home() {
       <div className="flex-1 overflow-y-auto min-h-0 flex flex-col">
         {activeTab === 'beranda' && (
           <main className="flex-1 flex flex-col pb-4">
-            <SummaryCards stats={stats} />
+            <div className="px-0 md:px-6 md:pt-3">
+              <SummaryCards stats={stats} />
+            </div>
 
-            <TransactionForm
-              customers={customers}
-              onSubmitTransaction={handleSubmitTransaction}
-            />
+            {viewMode === 'tablet' ? (
+              <div className="flex-1 min-h-0 md:grid md:grid-cols-12 md:gap-5 md:px-6 md:py-4">
+                <div className="md:col-span-5 md:overflow-y-auto space-y-4">
+                  <TransactionForm
+                    customers={customers}
+                    onSubmitTransaction={handleSubmitTransaction}
+                  />
+                </div>
 
-            <DebtList
-              debts={debts}
-              onMarkAsPaid={handleMarkAsPaid}
-              onUndoPaid={handleUndoPaid}
-              onOpenCustomerDetail={(debt) => setSelectedDebtDetail(debt)}
-              onOpenPartialPayment={(debt) => setPartialPaymentDebt(debt)}
-            />
+                <div className="md:col-span-7 md:overflow-y-auto space-y-4">
+                  <DebtList
+                    debts={debts}
+                    onMarkAsPaid={handleMarkAsPaid}
+                    onUndoPaid={handleUndoPaid}
+                    onOpenCustomerDetail={(debt) => setSelectedDebtDetail(debt)}
+                    onOpenPartialPayment={(debt) => setPartialPaymentDebt(debt)}
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <TransactionForm
+                  customers={customers}
+                  onSubmitTransaction={handleSubmitTransaction}
+                />
+
+                <DebtList
+                  debts={debts}
+                  onMarkAsPaid={handleMarkAsPaid}
+                  onUndoPaid={handleUndoPaid}
+                  onOpenCustomerDetail={(debt) => setSelectedDebtDetail(debt)}
+                  onOpenPartialPayment={(debt) => setPartialPaymentDebt(debt)}
+                />
+              </>
+            )}
           </main>
         )}
 
         {activeTab === 'pelanggan' && (
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
             <CustomersView
               customers={customers}
               debts={debts}
@@ -466,7 +494,7 @@ export default function Home() {
         )}
 
         {activeTab === 'transaksi' && (
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
             <TransactionsView debts={debts} onDeleteDebt={handleDeleteDebt} />
           </div>
         )}

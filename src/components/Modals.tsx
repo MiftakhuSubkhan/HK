@@ -28,7 +28,7 @@ export function NotificationModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-dropdown">
-      <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white w-full max-w-sm sm:max-w-md md:max-w-lg rounded-t-3xl sm:rounded-2xl p-4 md:p-6 max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
@@ -139,7 +139,7 @@ export function CustomerDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-dropdown">
-      <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-4.5 max-h-[90vh] overflow-y-auto shadow-2xl space-y-3.5">
+      <div className="bg-white w-full max-w-sm sm:max-w-md md:max-w-lg rounded-t-3xl sm:rounded-2xl p-4.5 md:p-6 max-h-[90vh] overflow-y-auto shadow-2xl space-y-3.5">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <h3 className="text-sm font-bold text-slate-900">Detail Piutang Peternak</h3>
           <button
@@ -410,7 +410,7 @@ export function PartialPaymentModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 animate-dropdown">
-      <div className="bg-white w-full max-w-sm rounded-2xl sm:rounded-3xl p-4 sm:p-5 max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 space-y-3">
+      <div className="bg-white w-full max-w-sm sm:max-w-md md:max-w-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 space-y-3.5">
         <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center shadow-2xs">

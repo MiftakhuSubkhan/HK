@@ -4,7 +4,7 @@
   "description": "Aplikasi manajemen piutang dan jatuh tempo pakan ternak sapi",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#0a492d",
   "theme_color": "#0a492d",
   "icons": [

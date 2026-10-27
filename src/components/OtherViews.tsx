@@ -99,33 +99,33 @@ export function CustomersView({
     : null;
 
   return (
-    <div className="flex-1 p-4 pb-6 space-y-3">
+    <div className="flex-1 p-4 md:p-6 pb-6 space-y-3 md:space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-bold text-slate-900">Daftar Pelanggan Peternak</h2>
-          <p className="text-[11px] text-slate-500">Total {customers.length} peternak terdaftar</p>
+          <h2 className="text-sm md:text-base font-bold text-slate-900">Daftar Pelanggan Peternak</h2>
+          <p className="text-[11px] md:text-xs text-slate-500">Total {customers.length} peternak terdaftar</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-[#127749] text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 shadow-xs cursor-pointer active:scale-95 transition-all"
+          className="bg-[#127749] hover:bg-[#0a492d] text-white px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95 transition-all"
         >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Tambah</span>
+          <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
+          <span>Tambah Peternak</span>
         </button>
       </div>
 
-      <div className="flex items-center bg-white rounded-xl border border-slate-200 px-2.5 py-1.5 shadow-xs">
-        <Search className="w-3.5 h-3.5 text-slate-400 mr-2" />
+      <div className="flex items-center bg-white rounded-xl border border-slate-200 px-3 py-2 shadow-xs max-w-md">
+        <Search className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400 mr-2" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cari pelanggan / desa..."
+          placeholder="Cari pelanggan / desa / nomor HP..."
           className="w-full text-xs bg-transparent focus:outline-none"
         />
       </div>
 
-      <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3">
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl p-6 border border-dashed border-slate-200 text-center space-y-2 my-2 shadow-2xs">
             <div className="w-10 h-10 mx-auto rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">
@@ -379,13 +379,13 @@ export function TransactionsView({ debts, onDeleteDebt }: TransactionsViewProps)
   };
 
   return (
-    <div className="flex-1 p-4 pb-6 space-y-3">
+    <div className="flex-1 p-4 md:p-6 pb-6 space-y-3 md:space-y-4">
       <div>
-        <h2 className="text-sm font-bold text-slate-900">Riwayat Transaksi Tempo</h2>
-        <p className="text-[11px] text-slate-500">Semua pencatatan tempo pakan yang tersimpan</p>
+        <h2 className="text-sm md:text-base font-bold text-slate-900">Riwayat Transaksi Tempo</h2>
+        <p className="text-[11px] md:text-xs text-slate-500">Semua pencatatan tempo pakan yang tersimpan ({debts.length} transaksi)</p>
       </div>
 
-      <div className="space-y-2.5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3.5">
         {debts.length === 0 ? (
           <div className="bg-white rounded-2xl p-6 border border-dashed border-slate-200 text-center space-y-2 my-2 shadow-2xs">
             <div className="w-10 h-10 mx-auto rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">

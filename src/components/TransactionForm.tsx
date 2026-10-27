@@ -209,7 +209,7 @@ export default function TransactionForm({
   };
 
   return (
-    <div className="mx-3 mt-3 bg-[#edf6f1] rounded-2xl p-3.5 border border-[#d3e6db] shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+    <div className="mx-3 mt-3 md:mx-0 md:mt-0 bg-[#edf6f1] rounded-2xl p-3.5 md:p-4.5 border border-[#d3e6db] shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-1.5">
           <div className="w-5 h-5 rounded-full bg-[#127749] text-white flex items-center justify-center">
@@ -603,7 +603,7 @@ export default function TransactionForm({
 
       {isViewingPhoto && photoUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 animate-dropdown">
-          <div className="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl space-y-3 p-3">
+          <div className="bg-white rounded-2xl max-w-sm sm:max-w-md w-full overflow-hidden shadow-2xl space-y-3 p-3.5 sm:p-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h4 className="text-xs font-bold text-slate-900">Foto Bukti Transaksi / Nota</h4>
               <button

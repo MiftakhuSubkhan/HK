@@ -79,7 +79,7 @@ export default function DebtList({
   };
 
   return (
-    <div className="px-3 pt-3 pb-24 space-y-2.5">
+    <div className="px-3 pt-3 md:px-0 md:pt-0 pb-24 md:pb-6 space-y-2.5">
       <div className="flex items-center justify-between px-0.5">
         <div className="flex items-center gap-1.5">
           <Layers className="w-4 h-4 text-slate-700" />
@@ -372,7 +372,7 @@ export default function DebtList({
 
       {selectedPhoto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 animate-dropdown">
-          <div className="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl space-y-3 p-3">
+          <div className="bg-white rounded-2xl max-w-sm sm:max-w-md w-full overflow-hidden shadow-2xl space-y-3 p-3.5 sm:p-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h4 className="text-xs font-bold text-slate-900">Foto Bukti Transaksi / Nota</h4>
               <button
